@@ -190,6 +190,32 @@ describe('newspaperOrderRule', (): void => {
             TestHelper.assertViolations(ruleName, script, []);
         });
 
+        it('should respect member-order when defining order', (): void => {
+            const script: string = `
+            interface Field {
+                key: string;
+                value: string;
+            };
+            class HasProtectedFieldsClass {
+                protected fields: Field[];
+                get(key: string): Field {
+                    return this.getField(key);
+                }
+                set(key: string, value: string): void {
+                    const f = this.getField(key)
+                    f.value = value;
+                }
+                anotherPublicMethod(): number {
+                    return 2;
+                }
+                protected getField(key: string): object {
+                    return this.fields[key];
+                }
+            }
+            `;
+            TestHelper.assertViolations(ruleName, script, []);
+        });
+
         it('should fail on class with incorrectly ordered methods with a recursive method', (): void => {
             const script: string = `
             class CountDownClass {
